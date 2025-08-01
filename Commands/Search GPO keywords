@@ -1,0 +1,18 @@
+Get-GPO -All | Where-Object { $_.DisplayName -like "*keyword*" }
+
+Example:
+Get-GPO -All | Where-Object { $_.DisplayName -like "*Firewall*" }
+
+or
+
+Search GPOs by GUID
+Get-GPO -Guid "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+or
+
+Search for GPOs Linked to an OU
+First, import the ActiveDirectory module if needed:
+Import-Module ActiveDirectory
+
+Then run:
+Get-GPInheritance -Target "OU=Workstations,DC=yourdomain,DC=com"
