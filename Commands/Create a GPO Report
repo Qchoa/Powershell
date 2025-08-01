@@ -1,0 +1,8 @@
+gpresult /h report.html
+start report.html
+
+This generates a report showing:
+
+Which GPOs were applied
+What settings came from where
+Whether anything was denied due to filtering or inheritance
