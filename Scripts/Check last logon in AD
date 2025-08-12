@@ -1,0 +1,3 @@
+# Run from a domain-joined computer with RSAT installed
+Get-ADUser -Identity "username" -Properties LastLogonDate | 
+Select-Object Name, LastLogonDate
