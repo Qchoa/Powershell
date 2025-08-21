@@ -1,0 +1,9 @@
+#Install the module to make the export to Excel possible
+Install-Module -Name ImportExcel
+
+#Tells powershell to get from ADUser and filter the search in the specific OU along with the Domain Controller, also identifies what attributes you want to pull and these are located in Properties
+Get-ADUser -Filter * -SearchBase "OU=Staff,OU=Fire,DC=co,DC=sbcgov,DC=net" -Properties Description, EmployeeID, Mail |
+#Select what attributes to get, So Name,Description,EmployeeID, and Email
+Select-Object Name, Description, EmployeeID, Mail | 
+#This exports it to the directory listed and makes the size appropriate to fit whats listed
+Export-Excel -Path "C:\ADUsers_HR.xlsx" -AutoSize
