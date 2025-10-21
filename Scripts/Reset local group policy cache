@@ -1,0 +1,5 @@
+This can help with GPOs being stuck
+
+rd /s /q %windir%\System32\GroupPolicy
+rd /s /q %windir%\System32\GroupPolicyUsers
+gpupdate /force
