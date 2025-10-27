@@ -1,0 +1,42 @@
+# ==============================
+# Windows Shutdown/Restart Report
+# ==============================
+
+# Collect the relevant shutdown/reboot events
+$events = Get-WinEvent -FilterHashtable @{LogName='System'; ID=6008,41,1001,1074,6005,6006} |
+Sort-Object TimeCreated
+
+$report = @()
+
+foreach ($evt in $events) {
+    $type = switch ($evt.Id) {
+        6008 { "Unexpected shutdown" }
+        41   { "Kernel-Power (power loss)" }
+        1001 { "BugCheck (crash/BSOD)" }
+        1074 { "Planned shutdown/restart" }
+        6005 { "Event Log started (boot)" }
+        6006 { "Event Log stopped (shutdown)" }
+        Default { "Other" }
+    }
+
+    # Try to parse the actual shutdown time from the 6008 message
+    $shutdownTime = $null
+    if ($evt.Id -eq 6008 -and $evt.Message -match "at (.*) on") {
+        try { $shutdownTime = [datetime]::ParseExact($matches[1], "HH:mm:ss", $null) } catch {}
+    }
+
+    $report += [pscustomobject]@{
+        LogTime       = $evt.TimeCreated
+        ShutdownTime  = if ($shutdownTime) { $shutdownTime } else { "" }
+        EventID       = $evt.Id
+        Type          = $type
+        Provider      = $evt.ProviderName
+        Message       = ($evt.Message -replace '\s+', ' ').Trim()
+    }
+}
+
+# Save to CSV
+$csvPath = "$env:USERPROFILE\Desktop\Shutdown_Report.csv"
+$report | Sort-Object LogTime -Descending | Export-Csv $csvPath -NoTypeInformation
+
+Write-Host "✅ Shutdown report saved to: $csvPath" -ForegroundColor Green
