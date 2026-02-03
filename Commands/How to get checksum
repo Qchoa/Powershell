@@ -5,3 +5,18 @@ Get-FileHash <File> -algorithm <ChecksumAlgorithm>
 
 Example:
 Get-FileHash .\npp.8.9.1.Installer.x64.exe -algorithm sha256
+
+Option 1: One file, many algorithms
+'MD5','SHA1','SHA256','SHA384','SHA512' |
+ForEach-Object {
+    Get-FileHash yourfile.ext -Algorithm $_
+}
+
+Option 2: Multiple algorithms & files
+Get-ChildItem *.ext |
+ForEach-Object {
+    $file = $_
+    'MD5','SHA1','SHA256' | ForEach-Object {
+        Get-FileHash $file -Algorithm $_
+    }
+}
