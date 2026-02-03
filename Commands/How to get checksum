@@ -1,0 +1,7 @@
+1. Open powershell
+2. CD into the directory
+3. Run this command
+Get-FileHash <File> -algorithm <ChecksumAlgorithm>
+
+Example:
+Get-FileHash .\npp.8.9.1.Installer.x64.exe -algorithm sha256
