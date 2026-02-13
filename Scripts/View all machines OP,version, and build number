@@ -1,0 +1,48 @@
+# Get all enabled computer accounts (no AD module required)
+$searcher = New-Object System.DirectoryServices.DirectorySearcher
+$searcher.Filter = "(&(objectCategory=computer)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
+$searcher.PageSize = 1000
+$searcher.PropertiesToLoad.Add("name") | Out-Null
+
+$computers = $searcher.FindAll() | ForEach-Object { $_.Properties.name[0] } | Sort-Object -Unique
+
+$results = foreach ($c in $computers) {
+    try {
+        # Prefer CIM over DCOM if allowed; fall back to DCOM
+        $os = Get-CimInstance Win32_OperatingSystem -ComputerName $c -ErrorAction Stop
+
+        [PSCustomObject]@{
+            ComputerName = $c
+            OSName       = $os.Caption
+            Version      = $os.Version
+            BuildNumber  = $os.BuildNumber
+            Status       = "OK"
+        }
+    }
+    catch {
+        # Try DCOM fallback (often works when WinRM is blocked)
+        try {
+            $os = Get-CimInstance Win32_OperatingSystem -ComputerName $c -Protocol Dcom -ErrorAction Stop
+
+            [PSCustomObject]@{
+                ComputerName = $c
+                OSName       = $os.Caption
+                Version      = $os.Version
+                BuildNumber  = $os.BuildNumber
+                Status       = "OK (DCOM)"
+            }
+        }
+        catch {
+            [PSCustomObject]@{
+                ComputerName = $c
+                OSName       = $null
+                Version      = $null
+                BuildNumber  = $null
+                Status       = "FAILED: $($_.Exception.Message)"
+            }
+        }
+    }
+}
+
+$results | Export-Csv "C:\Temp\AD_OS_Report.csv" -NoTypeInformation
+$results | Group-Object Status | Sort-Object Count -Descending | Select-Object Count, Name
