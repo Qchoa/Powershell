@@ -20,3 +20,12 @@ ForEach-Object {
         Get-FileHash $file -Algorithm $_
     }
 }
+
+Alternativy:
+
+Use this command to verify digital signature, should say "valid"
+Get-AuthenticodeSignature <File>
+
+Example:
+Get-AuthenticodeSignature .\updateplatform.amd64fre_*.exe
+
