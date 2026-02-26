@@ -1,0 +1,8 @@
+#Simple Version
+Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName AV6 |
+Select-Object PSComputerName, UserName
+
+#Complex Version with additional details(Needs WINRM)
+Invoke-Command -ComputerName Av6 -ScriptBlock {
+    query user
+}
