@@ -1,8 +1,61 @@
 #Simple Version
+
+Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName COMPUTERNAME |
+Select-Object PSComputerName, UserName
+
+EX:
 Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName AV6 |
 Select-Object PSComputerName, UserName
 
 #Complex Version with additional details(Needs WINRM)
+
+Invoke-Command -ComputerName COMPUTERNAME -ScriptBlock {
+    query user
+}
+
+EX:
 Invoke-Command -ComputerName Av6 -ScriptBlock {
     query user
+}
+
+#Best version
+
+# Prompt the user to type the computer name and store it in a variable called $ComputerName
+$ComputerName = Read-Host "Enter the computer name"
+
+# Use a Try block to attempt running the remote query
+# If anything fails (network issue, permissions, offline machine), execution jumps to Catch
+Try {
+
+    # Use Get-CimInstance to query the Win32_ComputerSystem class
+    # This class contains system-level info including the currently logged-in user
+    # -ComputerName tells PowerShell to query the remote machine
+    $Result = Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName $ComputerName
+
+    # Check if the UserName property contains a value
+    # If someone is logged in, this property will show DOMAIN\Username
+    If ($Result.UserName) {
+
+        # Display a formatted message showing who is logged in
+        Write-Host "User currently logged in on $ComputerName : $($Result.UserName)" -ForegroundColor Green
+
+    }
+    else {
+
+        # If UserName is empty, no interactive user session is detected
+        Write-Host "No user is currently logged in on $ComputerName" -ForegroundColor Yellow
+
+    }
+
+}
+
+Catch {
+
+    # If the Try block fails, this section runs
+    # $_ contains the actual error message returned by PowerShell
+    Write-Host "Failed to query $ComputerName" -ForegroundColor Red
+
+    # Display the specific error message so you know what went wrong
+    Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
+
 }
