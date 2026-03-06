@@ -1,0 +1,30 @@
+#https://powershellfaqs.com/install-windows-updates-using-powershell/
+
+Step 1: Install the PSWindowsUpdate Module
+Run this command to install the module from the PowerShell Gallery:
+
+Install-Module -Name PSWindowsUpdate -Force
+Note: If it prompts you to trust the repository, type Y and hit Enter.
+
+Step 2: Import the Module
+Once installed, import the module to your PowerShell session:
+
+Import-Module PSWindowsUpdate
+Step 3: Check for Available Updates
+To check for available updates in Windows, use the following command:
+
+Get-WindowsUpdate
+This command will list all available updates for your system without installing.
+
+It will show the Windows updates like below:
+
+Install Windows Updates Using PowerShell
+Step 4: Install Updates
+To install all available updates, use the Install-WindowsUpdate cmdlet:
+
+Install-WindowsUpdate -AcceptAll -AutoReboot
+-AcceptAll: Automatically accepts all updates.
+-AutoReboot: Automatically restarts if required after updates.
+This command will automatically accept all updates and reboot the system if necessary. If you prefer to install specific updates, use the -KBArticleID parameter:
+
+Install-WindowsUpdate -KBArticleID KB5012599, KB5012598 -AcceptAll -AutoReboot
