@@ -1,0 +1,16 @@
+$commands = @"
+net stop wuauserv
+net stop bits
+net stop cryptsvc
+rd /s /q C:\Windows\SoftwareDistribution
+net start wuauserv
+net start bits
+net start cryptsvc
+wuauclt /resetauthorization /detectnow
+"@
+
+$tempBat = "$env:TEMP\wu_reset.bat"
+$commands | Out-File -FilePath $tempBat -Encoding ASCII
+Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$tempBat`"" -Verb RunAs -Wait
+Remove-Item $tempBat -Force
+Write-Host "Done! Wait a few minutes then retry Windows Update." -ForegroundColor Green
